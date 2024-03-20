@@ -5,7 +5,7 @@
 export const environment = {
     production: false,
     hosts: [
-        { prefix: '/api', target: 'https://stagingapi.diveroid.com/v3/' },
+        { prefix: '/api', target: 'https://dhavalapi.sjonarrond.is/v3/' },
     ],
 };
 
