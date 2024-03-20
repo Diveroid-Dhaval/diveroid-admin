@@ -1,0 +1,151 @@
+<div class="w-full p-3 md:p-5 md:px-7">
+    <!-- title -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex flex-row mb-2 justify-between w-full">
+            <div class="text-4xl pl-5 font-semibold">Member Devices</div>
+        </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex items-center flex-auto">
+            <mat-form-field class="fuse-mat-rounded fuse-mat-dense
+                fuse-mat-no-subscript flex-auto ml-4 mr-5 lg:ml-0">
+                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:search" matPrefix></mat-icon>
+                <mat-icon svgIcon="heroicons_outline:x" matSuffix *ngIf="searchText.value"
+                    (click)="cancelSearch()"></mat-icon>
+                <input matInput [autocomplete]="'off'" placeholder="Search" [formControl]="searchText" #filter
+                    (input)="onSerach($event)">
+            </mat-form-field>
+        </div>
+
+    </div>
+
+    <div class="w-full p-3 mt-4 bg-card rounded-2xl shadow overflow-x-auto">
+        <table mat-table matSort [dataSource]="dataSource" class="w-full bg-transparent
+            whitespace-nowrap" (matSortChange)="sortChange($event)">
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>
+                    No.
+                </th>
+                <td mat-cell *matCellDef="let element;let i= index">
+                    {{(i + (paginator.pageIndex * paginator.pageSize)) + 1}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Member Name</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.member.Name
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="DeviceName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Device Name</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.devicemaster.DeviceName
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="DeviceSerialNumber">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Device Serial No.</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.DeviceSerialNumber
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="DeviceActivationDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Device Activation Date </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.DeviceActivationDate
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="DeviceThumb">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Image </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <img [src]="element.devicemaster.DeviceThumb" class="w-10" />
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="WarrantyEndDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Warranty End Date </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.WarrantyEndDate}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="FirmwareVersion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Firmware Version </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.FirmwareVersion
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="IsPaired">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Is Paired </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-slide-toggle [disabled]="true" [checked]="element.IsPaired"
+                        color="primary"></mat-slide-toggle>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span class="justify-center text-center flex"> Action
+                    </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="flex flex-row py-2 justify-center gap-2">
+
+                        <div class="" (click)="deleteRecord(element.id)">
+                            <mat-icon class="icon-size-7 text-red-500
+                                cursor-pointer" matTooltip="Delete" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container *matNoDataRow>
+                <tr class="text-center " aria-colspan="10">
+                    <td colspan="10" class="p-6 text-3xl font-semibold">
+                        No data
+                        found
+                    </td>
+                </tr>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+        </table>
+        <!-- pagination  -->
+        <mat-paginator #paginator [length]="totalRows" [pageIndex]="pageIndex" [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions" (page)="pageChanged($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

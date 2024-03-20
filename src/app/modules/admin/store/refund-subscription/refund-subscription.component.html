@@ -1,0 +1,235 @@
+<div class="w-full p-3 md:p-5 md:px-7">
+    <!-- title -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex flex-row mb-2 justify-between w-full">
+            <div class="text-4xl pl-5 font-semibold">Refund Subscriptions</div>
+        </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex items-center flex-auto">
+            <mat-form-field class="fuse-mat-rounded fuse-mat-dense
+                fuse-mat-no-subscript flex-auto ml-4 mr-5 lg:ml-0">
+                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:search" matPrefix></mat-icon>
+                <mat-icon svgIcon="heroicons_outline:x" matSuffix *ngIf="searchText.value"
+                    (click)="cancelSearch()"></mat-icon>
+                <input matInput [autocomplete]="'off'" placeholder="Search" [formControl]="searchText" #filter
+                    (input)="onSerach($event)">
+            </mat-form-field>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button mat-flat-button color="primary" (click)="openDialog(refundSubscriptionModal,false)"
+                matTooltip="Add Refund Subscription">
+                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                <span class="ml-2 mr-1">Add Refund Subscription</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full p-3 mt-4 bg-card rounded-2xl shadow overflow-x-auto">
+        <table mat-table matSort [dataSource]="dataSource" class="w-full bg-transparent
+            whitespace-nowrap" (matSortChange)="sortChange($event)">
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>
+                    No.
+                </th>
+                <td mat-cell *matCellDef="let element;let i= index">
+                    {{(i + (paginator.pageIndex * paginator.pageSize)) + 1}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="FeatureName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Feature Name </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element?.feature?.FeatureName}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="RefundDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Refund Date </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.RefundDate}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="RefundPrice">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span>Refund Price</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.RefundPrice}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Type </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.Type}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Reason">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span>Reason</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div [matTooltip]="element?.cancelsubscriptionreason?.Reason" class="cursor-pointer">
+
+                        <span>
+                            {{element?.cancelsubscriptionreason?.Reason?.length > 10 ?
+                            (element?.cancelsubscriptionreason?.Reason | slice:0:10 )+ '...' :
+                            element?.cancelsubscriptionreason?.Reason }}
+                        </span>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="SubscriptionName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span>Subscription Name </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element?.subscription?.SubscriptionName}}
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span class="justify-center text-center flex"> Action
+                    </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="flex flex-row py-2 justify-center gap-2">
+                        <div class="" (click)="openDialog(refundSubscriptionModal,true,element)">
+                            <mat-icon class="icon-size-7 text-green-500
+                                cursor-pointer" matTooltip="Update" [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                        </div>
+                        <div class="" (click)="deleteRecord(element.id)">
+                            <mat-icon class="icon-size-7 text-red-500
+                                cursor-pointer" matTooltip="Delete" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container *matNoDataRow>
+                <tr class="text-center " aria-colspan="8">
+                    <td colspan="8" class="p-6 text-3xl font-semibold">
+                        No data
+                        found
+                    </td>
+                </tr>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+        </table>
+        <!-- pagination  -->
+        <mat-paginator #paginator [length]="totalRows" [pageIndex]="pageIndex" [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions" (page)="pageChanged($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+
+<!-- Add or update dialog Box -->
+<ng-template let-data #refundSubscriptionModal>
+    <div class="form-container">
+        <h1 class="mat-dialog-title text-center">{{!isEdit?'Add':'Update'}} Refund Subscription </h1>
+        <div class="mat-dialog-content">
+
+            <!-- Form Group  -->
+            <form [formGroup]="refundForm" (ngSubmit)="saveForm()">
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <mat-label>Feature<span class="required-field"> *</span></mat-label>
+                    <mat-select formControlName="FeatureId" placeholder="Select Feature">
+                        <mat-option *ngFor="let feature of featureList" [value]="feature.id">
+                            {{feature.FeatureName}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="refundForm.controls['FeatureId'].hasError('required')">
+                        Please select feature
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <mat-label>Subscription<span class="required-field"> *</span></mat-label>
+                    <mat-select formControlName="SubscriptionId" placeholder="Select Subscription">
+                        <mat-option *ngFor="let subscription of subscriptionList" [value]="subscription.id">
+                            {{subscription.SubscriptionName}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="refundForm.controls['SubscriptionId'].hasError('required')">
+                        Please select subscription
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <mat-label>Cancel Reason<span class="required-field"> *</span></mat-label>
+                    <mat-select formControlName="CancelReasonId" placeholder="Select Cancel Reeason">
+                        <mat-option *ngFor="let cancel of cancelList" [value]="cancel.id">
+                            {{cancel.Reason}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="refundForm.controls['CancelReasonId'].hasError('required')">
+                        Please select cancel reason
+                    </mat-error>
+                </mat-form-field>
+
+
+                <div class="flex w-full space-x-3">
+                    <div class="flex w-full gap-2">
+                        <div class="w-1/2">
+                            <mat-form-field appearance="outline" class="example-full-width">
+                                <mat-label>Refund Price<span class="required-field"> *</span></mat-label>
+                                <input type="number" matInput formControlName="RefundPrice"
+                                    placeholder="Enter Refund Price" [min]="0" [step]="0" (keypress)="keyPress($event)">
+                                <mat-error *ngIf="refundForm.controls['RefundPrice'].hasError('required')">
+                                    Please enter refund price
+                                </mat-error>
+                                <mat-error *ngIf="refundForm.controls['RefundPrice'].hasError('min')">
+                                    Please enter valid refund price
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="w-1/2">
+                            <mat-label>Type<span class="required-field"> *</span></mat-label>
+                            <div>
+                                <mat-radio-group formControlName="Type" color="primary" class="example-full-width ">
+                                    <mat-radio-button *ngFor="let type of types" [value]="type" class="mt-2">
+                                        {{type}}
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <mat-error *ngIf="refundForm.controls['Type'].hasError('required')&& submitted"
+                                    class="text-sm mt-3">
+                                    Please select type
+                                </mat-error>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="justify-end md:flex gap-2 mt-2">
+                    <button mat-flat-button color="primary"> Submit
+                    </button>
+                    <button mat-stroked-button color="primary" matDialogClose> Cancel
+                    </button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+
+</ng-template>

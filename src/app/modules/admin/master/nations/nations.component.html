@@ -1,0 +1,183 @@
+<div class="w-full p-3 md:p-5 md:px-7">
+    <!-- title -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex flex-row mb-2 justify-between w-full">
+            <div class="text-4xl pl-5 font-semibold">Nations</div>
+        </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex items-center flex-auto">
+            <mat-form-field class="fuse-mat-rounded fuse-mat-dense
+                fuse-mat-no-subscript flex-auto ml-4 mr-5 lg:ml-0">
+                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:search" matPrefix></mat-icon>
+                <mat-icon svgIcon="heroicons_outline:x" matSuffix *ngIf="searchText.value"
+                    (click)="cancelSearch()"></mat-icon>
+                <input matInput [autocomplete]="'off'" placeholder="Search" [formControl]="searchText" #filter
+                    (input)="onSerach($event)">
+            </mat-form-field>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button mat-flat-button color="primary" (click)="openDialog(nationModal,false)" matTooltip="Add Nation">
+                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                <span class="ml-2 mr-1">Add Nation</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full p-3 mt-4 bg-card rounded-2xl shadow overflow-x-auto">
+        <table mat-table matSort [dataSource]="dataSource" class="w-full bg-transparent
+            whitespace-nowrap" (matSortChange)="sortChange($event)">
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>
+                    No.
+                </th>
+                <td mat-cell *matCellDef="let element;let i= index">
+                    {{(i + (paginator.pageIndex * paginator.pageSize)) + 1}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Nation">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Nation </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.Nation
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="NationCode">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Nation Code </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.NationCode}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ImageUrl">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Image Url </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <img [src]="element.ImageUrl" class="w-10" />
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span class="justify-center text-center flex"> Action
+                    </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="flex flex-row py-2 justify-center gap-2">
+                        <div class="" (click)="openDialog(nationModal,true,element)">
+                            <mat-icon class="icon-size-7 text-green-500
+                                cursor-pointer" matTooltip="Update" [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                        </div>
+                        <div class="" (click)="deleteRecord(element.id)">
+                            <mat-icon class="icon-size-7 text-red-500
+                                cursor-pointer" matTooltip="Delete" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container *matNoDataRow>
+                <tr class="text-center " aria-colspan="5">
+                    <td colspan="5" class="p-6 text-3xl font-semibold">
+                        No data
+                        found
+                    </td>
+                </tr>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+        </table>
+        <!-- pagination  -->
+        <mat-paginator #paginator [length]="totalRows" [pageIndex]="pageIndex" [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions" (page)="pageChanged($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+<!-- Add or update dialog Box -->
+<ng-template let-data #nationModal>
+    <div class="form-container">
+        <h1 class="mat-dialog-title text-center">{{!isEdit?'Add':'Update'}} Nation</h1>
+        <div class="mat-dialog-content">
+
+            <!-- Form Group Nation -->
+            <form [formGroup]="Nationform">
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <!-- Nation  field  -->
+                    <mat-label>Nation Name<span class="required-field"> *</span></mat-label>
+                    <input type="text" matInput formControlName="Nation" placeholder="Enter Nation Name"
+                        [maxlength]="50">
+                    <mat-error *ngIf=" Nationform.controls['Nation'].hasError('required')">
+                        Please enter nation name
+                    </mat-error>
+                    <mat-error *ngIf="Nationform.controls['Nation'].hasError('pattern')">
+                        Please enter valid nation name
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <!-- Nation Code field -->
+                    <mat-label>Nation Code<span class="required-field"> *</span></mat-label>
+                    <input type="text" matInput formControlName="NationCode" placeholder="Enter Nation Code "
+                        [maxlength]="15">
+                    <mat-error *ngIf="Nationform.controls['NationCode'].hasError('required')">
+                        Please enter nation code
+                    </mat-error>
+                    <mat-error *ngIf="Nationform.controls['NationCode'].hasError('pattern')">
+                        Please enter valid nation code
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-label>Upload Image<span class="required-field"> *</span></mat-label>
+                <div class="row flex flex-auto items-end mt-5 justify-left">
+                    <div
+                        class="relative flex items-center justify-center w-32 h-32 rounded-full overflow-hidden ring-4 
+                        ring-bg-card image-container border border-gray-300 upload-image">
+                        
+                        <div class="absolute inset-0 flex items-center justify-center z-20">
+                            <div>
+                                <input type="file" class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                                    [multiple]="false" accept=".jpg,.jpeg,.png" (change)="onFileSelected($event)"
+                                    id="avatar-file-input" [hidden]="true" #profileFileInput />
+                                <label
+                                    class="flex items-center justify-center w-10 h-10 rounded-full 
+                                    cursor-pointer hover:bg-hover"
+                                    for="avatar-file-input" matRipple>
+                                    <mat-icon class="text-[#666] upload-icon hover:text-white"
+                                        [svgIcon]="'mat_outline:file_upload'"></mat-icon>
+                                </label>
+                            </div>
+                        </div>
+                        <img class="object-cover w-full h-full"
+                            [src]="imageFile" [ngClass]="imageFile==undefined ? 'hidden' :''">
+                    </div>
+                </div>
+              
+                
+                
+
+
+
+
+                <div class="justify-end md:flex gap-2 mt-6">
+                    <button mat-flat-button color="primary" (click)="saveForm()"> Submit
+                    </button>
+                    <button mat-stroked-button color="primary" matDialogClose> Cancel
+                    </button>
+                </div>
+            </form>
+
+
+        </div>
+
+    </div>
+</ng-template>

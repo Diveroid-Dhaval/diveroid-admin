@@ -1,0 +1,51 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+.mat-form-field-appearance-outline .mat-form-field-subscript-wrapper {
+    padding: 0px !important;
+}
+.success-style {
+    border-color: rgb(21 128 61);
+    background: rgb(187 247 208) !important;
+    color: rgb(21 128 61) !important;
+}
+
+.error-style {
+    border-color: rgb(220 38 38);
+    background: rgb(254 202 202) !important;
+    color: rgb(185 28 28) !important;
+}
+/* styles.scss */
+.warning-style {
+    border-color: #ffc107;
+    background: #fff3cd !important;
+    color: #ffc107 !important;
+}
+/* styles.scss */
+.primary-style {
+    border-color: #007bff;
+    background: #cce5ff !important;
+    color: #007bff !important;
+}
+.badge-soft-danger {
+    color: #f46a6a;
+    background-color: rgba(244, 106, 106, 0.18);
+    font-weight: 600;
+}
+.badge-soft-success {
+    color: #34c38f;
+    background-color: rgba(52, 195, 143, 0.18);
+    font-weight: 600;
+}
+.badge-soft-warning {
+    color: #f1b44c;
+    background-color: rgba(241, 180, 76, 0.18);
+    font-weight: 600;
+}
+.required-field {
+    color: red;
+}
+.example-full-width {
+    width: 100%;
+}

@@ -1,0 +1,24 @@
+<div class="relative flex flex-col w-full h-full">
+
+    <div class="flex flex-col sm:flex-row flex-auto items-center sm:items-start p-6 pb-6 sm:pb-8">
+
+        <div class="flex flex-0 items-center justify-center w-10 h-10 sm:mr-4 rounded-full text-warn-600 bg-warn-100 dark:text-warn-50 dark:bg-warn-600 ng-star-inserted">
+            <mat-icon svgIcon="heroicons_outline:exclamation" style="color: red;"></mat-icon>
+        </div>
+
+        <div class="flex flex-col items-center sm:items-start mt-4 sm:mt-0 sm:pr-8 space-y-1 text-center sm:text-left ng-star-inserted">
+            <div class="text-xl leading-6 font-medium ng-star-inserted">Delete {{title}}</div>
+            <div class="text-secondary ng-star-inserted">{{message}}</div>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-center sm:justify-end px-6 py-4 space-x-3  dark:bg-opacity-10 ng-star-inserted" >
+
+        <button mat-flat-button color="warn" mat-dialog-close (click)="onConfirmClick()">Confirm</button>
+        <button mat-stroked-button color="primary" mat-dialog-close>Cancel</button>
+
+    </div> 
+
+</div>
+
+

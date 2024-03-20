@@ -1,0 +1,205 @@
+<div class="w-full p-3 md:p-5 md:px-7">
+    <!-- title -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex flex-row mb-2 justify-between w-full">
+            <div class="text-4xl pl-5 font-semibold">Gift Cards</div>
+        </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex items-center flex-auto">
+            <mat-form-field class="fuse-mat-rounded fuse-mat-dense
+                fuse-mat-no-subscript flex-auto ml-4 mr-5 lg:ml-0">
+                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:search" matPrefix></mat-icon>
+                <mat-icon svgIcon="heroicons_outline:x" matSuffix *ngIf="searchText.value"
+                    (click)="cancelSearch()"></mat-icon>
+                <input matInput [autocomplete]="'off'" placeholder="Search" [formControl]="searchText" #filter
+                    (input)="onSerach($event)">
+            </mat-form-field>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button mat-flat-button color="primary" (click)="openDialog(giftCardModal,false)"
+                matTooltip="Add Gift Card">
+                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                <span class="ml-2 mr-1">Add Gift Card</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full p-3 mt-4 bg-card rounded-2xl shadow overflow-x-auto">
+        <table mat-table matSort [dataSource]="dataSource" class="w-full bg-transparent
+            whitespace-nowrap" (matSortChange)="sortChange($event)">
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>
+                    No.
+                </th>
+                <td mat-cell *matCellDef="let element;let i= index">
+                    {{(i + (paginator.pageIndex * paginator.pageSize)) + 1}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="DistributerName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Distributer Name </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element?.storedistributer?.DistributerName}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="DistributerEmail">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Distributer Email </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element?.storedistributer?.DistributerEmail}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Status </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element?.status?.Name}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="GiftCode">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span>Gift Code</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.GiftCode}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="GiftAppleProductId">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span>Gift Apple ProductId</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                   {{element.GiftAppleProductId}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="GiftGoogleProductId">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span>Gift Google ProductId</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                   {{element.GiftGoogleProductId}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span class="justify-center text-center flex"> Action
+                    </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="flex flex-row py-2 justify-center gap-2">
+                        <div class="" (click)="openDialog(giftCardModal,true,element)">
+                            <mat-icon class="icon-size-7 text-green-500
+                                cursor-pointer" matTooltip="Update" [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                        </div>
+                        <div class="" (click)="deleteRecord(element.id)">
+                            <mat-icon class="icon-size-7 text-red-500
+                                cursor-pointer" matTooltip="Delete" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container *matNoDataRow>
+                <tr class="text-center " aria-colspan="8">
+                    <td colspan="8" class="p-6 text-3xl font-semibold">
+                        No data
+                        found
+                    </td>
+                </tr>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+        </table>
+        <!-- pagination  -->
+        <mat-paginator #paginator [length]="totalRows" [pageIndex]="pageIndex" [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions" (page)="pageChanged($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+
+<!-- Add or update dialog Box -->
+<ng-template let-data #giftCardModal>
+    <div class="form-container">
+        <h1 class="mat-dialog-title text-center">{{!isEdit?'Add':'Update'}} Gift Card </h1>
+        <div class="mat-dialog-content">
+
+            <!-- Form Group  -->
+            <form [formGroup]="giftCardForm" (ngSubmit)="saveForm()">
+
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <mat-label>Gift Code<span class="required-field"> *</span></mat-label>
+                    <input type="text" matInput formControlName="GiftCode" placeholder="Enter Gift Code">
+                    <mat-error *ngIf="giftCardForm.controls['GiftCode'].hasError('required')">
+                        Please enter gift code
+                    </mat-error>
+                    <mat-error *ngIf="giftCardForm.controls['GiftCode'].hasError('pattern')">
+                        Please enter valid gift code
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <mat-label>Distributer<span class="required-field"> *</span></mat-label>
+                    <mat-select formControlName="DistributerId" placeholder="Select Distributer">
+                        <mat-option *ngFor="let distributer of distributers" [value]="distributer.id">
+                            {{distributer.DistributerName}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="giftCardForm.controls['DistributerId'].hasError('required')">
+                        Please select distributer
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <mat-label>Gift Apple ProductId<span class="required-field"> *</span></mat-label>
+                    <input type="text" matInput formControlName="GiftAppleProductId" placeholder="Enter Gift Apple ProductId">
+                    <mat-error *ngIf="giftCardForm.controls['GiftAppleProductId'].hasError('required')">
+                        Please enter gift apple productId
+                    </mat-error>
+                    <mat-error *ngIf="giftCardForm.controls['GiftAppleProductId'].hasError('pattern')">
+                        Please enter valid gift apple productId
+                    </mat-error>
+                </mat-form-field>
+              
+               <mat-form-field appearance="outline" class="example-full-width">
+                    <mat-label>Gift Google ProductId<span class="required-field"> *</span></mat-label>
+                    <input type="text" matInput formControlName="GiftGoogleProductId" placeholder="Enter Gift Google ProductId">
+                    <mat-error *ngIf="giftCardForm.controls['GiftGoogleProductId'].hasError('required')">
+                        Please enter gift google productId
+                    </mat-error>
+                    <mat-error *ngIf="giftCardForm.controls['GiftGoogleProductId'].hasError('pattern')">
+                        Please enter valid gift google productId
+                    </mat-error>
+                </mat-form-field>
+
+                <div class="justify-end md:flex gap-2 ">
+                    <button mat-flat-button color="primary"> Submit
+                    </button>
+                    <button mat-stroked-button color="primary" matDialogClose> Cancel
+                    </button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+
+</ng-template>

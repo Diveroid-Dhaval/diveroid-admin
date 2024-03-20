@@ -1,0 +1,192 @@
+<div class="w-full p-3 md:p-5 md:px-7">
+    <!-- title -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex flex-row mb-2 justify-between w-full">
+            <div class="text-4xl pl-5 font-semibold">Device Categories</div>
+        </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex items-center flex-auto">
+            <mat-form-field class="fuse-mat-rounded fuse-mat-dense
+                fuse-mat-no-subscript flex-auto ml-4 mr-5 lg:ml-0">
+                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:search" matPrefix></mat-icon>
+                <mat-icon svgIcon="heroicons_outline:x" matSuffix *ngIf="searchText.value"
+                    (click)="cancelSearch()"></mat-icon>
+                <input matInput [autocomplete]="'off'" placeholder="Search" [formControl]="searchText" #filter
+                    (input)="onSerach($event)">
+            </mat-form-field>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button mat-flat-button color="primary" (click)="openDialog(categorymodal,false)"
+                matTooltip="Add Device Category">
+                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                <span class="ml-2 mr-1">Add Device Category</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full p-3 mt-4 bg-card rounded-2xl shadow overflow-x-auto">
+        <table mat-table matSort [dataSource]="dataSource" class="w-full bg-transparent
+            whitespace-nowrap" (matSortChange)="sortChange($event)">
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>
+                    No.
+                </th>
+                <td mat-cell *matCellDef="let element;let i= index">
+                    {{(i + (paginator.pageIndex * paginator.pageSize)) + 1}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="DeviceCategoryName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Device Name </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.DeviceCategoryName
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="DeviceCategoryThumb">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Image </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <img [src]="element.DeviceCategoryThumb" class="w-10" />
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="WarrantyYear">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Warranty Year </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.WarrantyYear}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span class="justify-center text-center flex"> Action
+                    </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="flex flex-row py-2 justify-center gap-2">
+                        <div class="" (click)="openDialog(categorymodal,true,element)">
+                            <mat-icon class="icon-size-7 text-green-500
+                                cursor-pointer" matTooltip="Update" [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                        </div>
+                        <div class="" (click)="deleteRecord(element.id)">
+                            <mat-icon class="icon-size-7 text-red-500
+                                cursor-pointer" matTooltip="Delete" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container *matNoDataRow>
+                <tr class="text-center " aria-colspan="5">
+                    <td colspan="5" class="p-6 text-3xl font-semibold">
+                        No data
+                        found
+                    </td>
+                </tr>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+        </table>
+        <!-- pagination  -->
+        <mat-paginator #paginator [length]="totalRows" [pageIndex]="pageIndex" [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions" (page)="pageChanged($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+<!-- Add or update dialog Box -->
+<ng-template let-data #categorymodal>
+    <div class="form-container">
+        <h1 class="mat-dialog-title text-center">{{!isEdit?'Add':'Update'}} Device Category</h1>
+        <div class="mat-dialog-content">
+
+            <form [formGroup]="categoryform">
+
+                <mat-form-field appearance="outline" class="example-full-width">
+                    <!-- Device Category Name  field  -->
+                    <mat-label>Device Category Name<span class="required-field"> *</span></mat-label>
+                    <input type="text" matInput formControlName="DeviceCategoryName"
+                        placeholder="Enter Device Category Name" [maxlength]="50">
+                    <mat-error *ngIf=" categoryform.controls['DeviceCategoryName'].hasError('required')">
+                        Please enter device category name
+                    </mat-error>
+                    <mat-error *ngIf="categoryform.controls['DeviceCategoryName'].hasError('pattern')">
+                        Please enter valid device category name
+                    </mat-error>
+                </mat-form-field>
+
+                <div class="row">
+                    <div class="mb-3 example-form-fields gap-2" style="display: flex; flex-wrap: wrap;">
+                        <mat-form-field appearance="outline" style="flex: 1; margin-right: 10px;">
+                            <mat-label>Warranty Year<span class="required-field"> *</span></mat-label>
+                            <input type="number" matInput formControlName="WarrantyYear"
+                                placeholder="Enter Warranty Year" [maxlength]="2" [min]="1" [step]="1" (keypress)="keyPress($event)">
+                            <mat-error *ngIf="categoryform.controls['WarrantyYear'].hasError('required')">
+                                Please enter warranty year
+                            </mat-error>
+                            <mat-error
+                                *ngIf="categoryform.controls['WarrantyYear'].hasError('max')||categoryform.controls['WarrantyYear'].hasError('min')">
+                                Please enter valid warranty year
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" style="flex: 1;">
+                            <mat-label>Parent Device</mat-label>
+                            <mat-select formControlName="parentId" placeholder="Select Parent Device">
+                                <mat-option *ngFor="let device of deviceList" [value]="device.ParentId">
+                                    {{device.DeviceCategoryName}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+               <mat-label>Upload Image<span class="required-field"> *</span></mat-label>
+                <div class="row flex flex-auto items-end mt-5 justify-left">
+                    <div class="relative flex items-center justify-center w-32 h-32 rounded-full overflow-hidden ring-4 
+                    ring-bg-card image-container border border-gray-300 upload-image">
+                        
+                        <div class="absolute inset-0 flex items-center  justify-center z-20" >
+                            <label class="flex items-center justify-center rounded-full bg-[#666] cursor-pointer 
+                            hover:bg-hover" 
+                                    for="avatar-file-input" matRipple>
+                            <div>
+                                <input type="file" class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
+                                    [multiple]="false" accept=".jpg,.jpeg,.png" (change)="onFileSelected($event)"
+                                    id="avatar-file-input" [hidden]="true" #profileFileInput />
+                                
+                                    <mat-icon class="text-[#666] upload-icon hover:text-white"
+                                        [svgIcon]="'mat_outline:file_upload'"></mat-icon>
+                                        
+                                    </div>
+                                </label>
+                        </div>
+                        <img class="object-cover w-full h-full " [src]=" imageFile" [ngClass]="imageFile==undefined ? 'hidden' :''">
+                    </div>
+                </div> 
+
+                <div class="justify-end md:flex gap-2 mt-6">
+                    <button mat-flat-button color="primary" (click)="saveForm()"> Submit
+                    </button>
+                    <button mat-stroked-button color="primary" matDialogClose> Cancel
+                    </button>
+                </div>
+            </form>
+
+
+        </div>
+
+    </div>
+</ng-template>

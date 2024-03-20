@@ -1,0 +1,154 @@
+<div class="w-full p-3 md:p-5 md:px-7">
+    <!-- title -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex flex-row mb-2 justify-between w-full">
+            <div class="text-4xl pl-5 font-semibold">Suggestions </div>
+        </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center
+        sm:justify-between">
+        <div class="flex items-center flex-auto">
+            <mat-form-field class="fuse-mat-rounded fuse-mat-dense
+                fuse-mat-no-subscript flex-auto ml-4 mr-5 lg:ml-0">
+                <mat-icon class="icon-size-5" svgIcon="heroicons_solid:search" matPrefix></mat-icon>
+                <mat-icon svgIcon="heroicons_outline:x" matSuffix *ngIf="searchText.value"
+                    (click)="cancelSearch()"></mat-icon>
+                <input matInput [autocomplete]="'off'" placeholder="Search" [formControl]="searchText" #filter
+                    (input)="onSerach($event)">
+            </mat-form-field>
+        </div>
+
+    </div>
+
+    <div class="w-full p-3 mt-4 bg-card rounded-2xl shadow overflow-x-auto">
+        <table mat-table matSort [dataSource]="dataSource" class="w-full bg-transparent
+            whitespace-nowrap" (matSortChange)="sortChange($event)">
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>
+                    No.
+                </th>
+                <td mat-cell *matCellDef="let element;let i= index">
+                    {{(i + (paginator.pageIndex * paginator.pageSize)) + 1}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Title">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Title </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span>
+                        {{element.Title
+                        }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Content">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Content </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="flex items-center justify-start">
+                        <div [matTooltip]="element.Content" class="cursor-pointer">
+                            <span [innerHTML]="element.Content">
+                                {{element.Content?.length > 20 ? (element.Content| slice:0:20) + '...' :
+                                element.Content }}
+                            </span>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span> Type </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element?.suggestiontype?.Type}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    <span>Member Name </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element?.member?.Name}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="suggestionmedia">
+                <th mat-header-cell *matHeaderCellDef >
+                    <span>View Media </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <button>
+                        <mat-icon svgIcon="mat_solid:perm_media" matTooltip="View Media"
+                            (click)="openDialog(displayMediaFiles,element)"></mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span class="justify-center text-center flex"> Action
+                    </span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class="flex flex-row py-2 justify-center gap-2">
+                        <div class="" (click)="deleteRecord(element.id)">
+                            <mat-icon class="icon-size-7 text-red-500
+                                cursor-pointer" matTooltip="Delete" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container *matNoDataRow>
+                <tr class="text-center " aria-colspan="7">
+                    <td colspan="7" class="p-6 text-3xl font-semibold">
+                        No data
+                        found
+                    </td>
+                </tr>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+        </table>
+        <!-- pagination  -->
+        <mat-paginator #paginator [length]="totalRows" [pageIndex]="pageIndex" [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions" (page)="pageChanged($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+<!-- modal for display media files -->
+<ng-template let-data #displayMediaFiles>
+    <h1 mat-dialog-title class="text-center">Media Files</h1>
+    <div mat-dialog-content class="grid grid-cols-4 gap-4">
+        <div *ngFor="let data of suggestionmedia">
+            <div *ngIf="data.MediaType=='jpg' || data.MediaType=='png' || data.MediaType=='jpeg'">
+                <img [src]="data.MediaLink" style="width: 100%; height: 130px;" />
+                <span class="text-sm capitalize leading-[16px] text-black font-medium block mt-2 overflow-hidden">
+                    {{data.FileName}}
+                </span>
+            </div>
+            <div *ngIf="data.MediaType=='mp4'" class="pb-12">
+                <video controls style="width: 100%; height: 130px;" >
+                    <source [src]="sanitizeUrl(data.MediaLink)" type="video/mp4">
+                </video>
+                <span class="text-sm capitalize leading-[16px] text-black font-medium block mt-2 overflow-hidden">
+                    {{data.FileName}}
+                </span>
+            </div>
+        </div>
+        <div *ngIf="suggestionmedia?.length==0" class="text-center text-lg">
+            No data Found
+        </div>
+    </div>
+    <div mat-dialog-actions class="justify-end">
+        <button mat-raised-button [mat-dialog-close]="true" color="primary">Cancel</button>
+    </div>
+</ng-template>

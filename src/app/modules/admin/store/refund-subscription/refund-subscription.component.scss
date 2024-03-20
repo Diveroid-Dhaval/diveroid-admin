@@ -1,0 +1,11 @@
+.text-sm {
+    font-size: 0.70rem !important;
+}
+::ng-deep .mat-tooltip {
+    font-size: 14px!important;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
